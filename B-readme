@@ -1,7 +1,7 @@
 # Parameters for backup are set inside 'B-script-1.sh'
 # See notes inside 'B-script-1.sh'
 # Type 'nano B-script-1.sh' in order to read notes and specify the parameters
-#
+#   
 #==================================================================
 #
 # All files related to the backup script are located inside directory 'EpamBackup'.
