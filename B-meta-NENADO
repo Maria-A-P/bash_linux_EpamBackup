@@ -1,7 +1,0 @@
-#! /bin/bash
-
-echo $(pwd)
-
-source "B-settings-NENADO"
-echo "a=" $a
-echo "b=" $b
