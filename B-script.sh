@@ -369,7 +369,7 @@ do
 done
 
 short_names_are_different_test=0
-if (( at_least_one_coincidence_found != 0 )) ; then
+if (( ${at_least_one_coincidence_found} != 0 )) ; then
 	echo "Archives should be given different names - check input_name for each archive"
         short_names_are_different_test=1
 else
@@ -423,7 +423,7 @@ fi                                                                           # N
 # getting sure the paths are expanded:
 declare -a the_most_full_PLUS_paths
 declare -a PLUS_path_test_result
-if [[ UserName!="root" ]]; then           # first, lets extract all the paths
+if [[ ${UserName} != "root" ]]; then           # first, lets extract all the paths
 	echo
 	echo "expanding plus_paths...."
 	for ((j=1; j<=${param_sets_quantity}; j=j+1))
@@ -479,6 +479,20 @@ fi
 # if this script is started with sudo, then the user is detected as 'root' and his home dir - as '/root'
 # (script works correctly, but  executing this script with "sudo" is not recommended) 
 # (proverka idet na prinadlezhnostj arhiviruemyh papok papke "script_LEVELUP_dir")
+
+# =============================================================================================
+
+# check if files and dirs (plus and minus) exist - USELESS - will not work for file masks
+# the only way to get sure is to read  B-log-errors
+#
+# for ((i=1; i<=${param_sets_quantity}; i=i+1))
+# do
+# 	plus_paths_exist_test_result[$i]=0         # 0 will mean ok, paths exist
+# 	for ip in ${plus_masks[$i]}
+# 	do
+# 		if ! $(test -e ${ip}); then plus_paths_exist_test_result[$i]+=1; fi
+# 	done
+# done
 
 
 # =============================================================================================

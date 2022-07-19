@@ -10,10 +10,10 @@
 # The directory 'EpamBackup' should be placed either in   '/root/'  or in   '/~/'  (the home directory of a user)
 # 
 # If the path to 'EpamBackup' directory is  '/root/EpamBackup' 
-# then one can choose to backup any files ( ??? except those located inside users' home directories (inside /home) - NO...)  (PROVERIT')
+#  any files can be added to backup archives                            (PROVERIT'-ok)
 #
 # If the path to 'EpamBackup' directory is '/home/u_s_e_r_n_a_m_e/EpamBackup' 
-# then files within '/home/u_s_e_r_n_a_m_e/' only can be chosen to be backed-up                               (PROVERIT')
+# then files within '/home/u_s_e_r_n_a_m_e/' only can be chosen to be backed-up    (PROVERIT'-ok)
 #
 # 
 # Appropriate rwx rights and ownership for the script file (B-script.sh) (and maybe for the whole folder EpamBackup)
@@ -28,13 +28,13 @@
 # The name of the archive to be created will consist of 
 #        the parameters set's number and (short) name, and local and universal dates. 
 #
-# The name of the set of parameters should not exceed 15 characters,                                 (PROVERIT')
-#    may consist of alphanumeric symbols (A-Z, a-z, 0-9) and dash (-) only,                        (PROVERIT')
+# The name of the set of parameters should not exceed 15 characters,                                 (PROVERIT'-ok)
+#    may consist of alphanumeric symbols (A-Z, a-z, 0-9) and dash (-) only,                        (PROVERIT'-ok)
 #    and should start with a letter.
 #
 # The archives are saved inside 'EpamBackup/B-Archives/'.
 #
-# Directory 'B-Archives'  should not be deleted, copied or renamed.                                           (PROVERIT')
+# Directory 'B-Archives'  should not be deleted, copied or renamed.                    (PROVERIT'-ok)
 #
 # Old archives should be deleted manually (for safety reasons no auto deletion is performed).
 #
@@ -45,6 +45,7 @@
 # Settings for all parameters sets get into file B-log.
 #
 # All errors and error-like messages are saved to B-log-errors 
+#   (phrases like "Removing leading '/' ..." are not namely errors, though tar sends them into stderr)
 #
 # B-log and B-Log-errors files are generated in EpamBackup directory. 
 # B-log and B-Log-errors files should be cleaned off (or deleted) manually as they become quite large.
@@ -53,21 +54,21 @@
 #
 # A user or system administrator must specify the following parameters:
 # - the disk space usage (DSU) limit for archives in 'EpamBackup/B-archives/'
-#         (if the limit is reached, a message is sent to command line interface and to 'B-log', 
-#          but no deletion is performed)                                                            (PROVERIT')
+#         (if the limit is reached or is getting close, a message is sent to command line interface, 
+#          but no deletion is performed)                                                             (PROVERIT'-ok)
 #          ('0' or '' means 'no limit'),
 # - the names of directories and separate files to be archived
-#           (as described in "Pattern Matching" section of Bash reference manual - e.g. '~/Documents', or '/*')                  
+#           (as described in "Pattern Matching" section of Bash reference manual - e.g. '~/Documents', or '/*')
 #           A user can choose directories and files inside his home directory only (in case of  '/home/"username"/EpamBackup/'),
 #           a system aministrator may choose any (in case of /root/EpamBackup/).
 #           Note that the leading '/' is removed from full paths for directories and files as they get into an archive.
 #           Also note that any hard or symbolic links are being archived as a full copy of the file they were pointing at.
 #           The amount of patterns for directories and separate files paths together is currently limited by 5.
-# - the names of directories and files inside the above-mentioned directories that should not be archived       (PROVERIT')
-#           (as described in "Pattern Matching" section of Bash reference manual - e.g. '*.mp3', or '~/.??*')                 
+# - the names of directories and files inside the above-mentioned directories that should not be archived      (PROVERIT'-ok)
+#           (as described in "Pattern Matching" section of Bash reference manual - e.g. '*.mp3', or '~/.??*')
 #           The amount of patterns for directories and files paths together is currently limited by 5.
-# - a compression algorithm                                                                           (PROVERIT')
-# - the need for verification of created archives (recommended, but takes time)                       (PROVERIT')
+# - a compression algorithm                                                                           (PROVERIT'-ok)
+# - the need for verification of created archives (recommended, but takes time)                       (PROVERIT'-k)
 #
 #
 #===================================================================
