@@ -1,6 +1,6 @@
-# Parameters for backup are set inside 'B-script-1.sh'
-# See notes inside 'B-script-1.sh'
-# Type 'nano B-script-1.sh' in order to read notes and specify the parameters
+# Parameters for backup are set inside 'B-script.sh'
+# See notes inside 'B-script.sh'
+# Type 'nano B-script.sh' in order to read notes and specify the parameters
 #   
 #==================================================================
 #
@@ -9,10 +9,10 @@
 #
 # The directory 'EpamBackup' should be placed either in   '/root/'  or in   '/~/'  (the home directory of a common user)
 # 
-# If the path to the directory is  '/root/EpamBackup' 
-# then one can choose to backup any files except those located inside common users' home directories     (PROVERIT')
+# If the path to 'EpamBackup' directory is  '/root/EpamBackup' 
+# then one can choose to backup any files ( ??? except those located inside users' home directories (inside /home) - NO...)  (PROVERIT')
 #
-# If the path to the directory is '/home/"u_s_e_r_n_a_m_e"/EpamBackup' 
+# If the path to 'EpamBackup' directory is '/home/"u_s_e_r_n_a_m_e"/EpamBackup' 
 # then files within '/home/"u_s_e_r_n_a_m_e"/' only can be chosen to be backed-up                               (PROVERIT')
 #
 # 
@@ -25,8 +25,9 @@
 # (currently they are to be specified inside the script, in a separate section, 
 #  and the amount of sets of parameters is currently limited by 3).
 # 
-# The name of the archive to be created will start with the ordinal number and the specified name of the set of parameters, 
-# with both local and universal dates included.
+# The name of the archive to be created will consist of 
+#        the parameters set's number and (short) name, and local and universal dates. 
+#
 # The name of the set of parameters should not exceed 15 characters,                                 (PROVERIT')
 #    may consist of alphanumeric symbols (A-Z, a-z, 0-9) and dash (-) only,                        (PROVERIT')
 #    and should start with a letter.

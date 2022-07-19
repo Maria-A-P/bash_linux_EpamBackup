@@ -49,7 +49,7 @@ declare -a input_verify                          # - verify the archive as does 
 
 # =============================================================================================
 # overall parameters:
-input_DSU_limit_MiB=1              # disk space usage limit in mebibytes - to be occupied by all of the saved archives
+input_DSU_limit_MiB=100             # disk space usage limit in mebibytes - to be occupied by all of the saved archives
                                     # (archives are saved in 'EpamBackup/B-Archives/')
                                     # (if the limit is reached, only a message is generated, but no deletion is performed)
                                     # (0 means "no limit")
@@ -75,7 +75,7 @@ input_dirs_and_files_plus_3[ord]=                #   print nothing after = if th
 input_dirs_and_files_plus_4[ord]=                #   but do not delete lines
 input_dirs_and_files_plus_5[ord]=                #   also do not duplicate lines, the max number of masks is 5.
 
-input_dirs_and_files_minus_1[ord]=~/D*          # directories and separate file names (or masks) TO BE included in the archive
+input_dirs_and_files_minus_1[ord]=~/D*          # directories and separate file names (or masks) NOT TO BE included in the archive
 input_dirs_and_files_minus_2[ord]=*.mp3          #   (one by each variable, WITHOUT QUOTES -WHY? I FORGOT... WITH = OK)
 input_dirs_and_files_minus_3[ord]=~/.*              #   print nothing after = if there is no need for another mask
 input_dirs_and_files_minus_4[ord]=*.mymymy              #   but do not delete lines
@@ -83,7 +83,7 @@ input_dirs_and_files_minus_5[ord]=               #   also do not duplicate lines
 
               input_compress[ord]='bzip2'        # - compression agorythm:
                                                  # 'none' or one of: 'gzip', 'bzip2', 'xz', 'lzip', 'lzma', 'lzop', 'zstd'
-                input_verify[ord]='on'           # - verify the archive as does "tar --verify" ('on') or not ('off')
+                input_verify[ord]='on'           # - verify the archive as does "tar --verify" ('on') or do not verify ('off')
 
 
 
@@ -107,7 +107,7 @@ input_dirs_and_files_plus_3[ord]=                #   print nothing after = if th
 input_dirs_and_files_plus_4[ord]=                #   but do not delete lines
 input_dirs_and_files_plus_5[ord]=                #   also do not duplicate lines, the max number of masks is 5.
 
-input_dirs_and_files_minus_1[ord]=*.txt          # directories and separate file names (or masks) TO BE included in the archive
+input_dirs_and_files_minus_1[ord]=*.txt          # directories and separate file names (or masks) NOT TO BE included in the archive
 input_dirs_and_files_minus_2[ord]=*.bmp          #   (one by each variable, WITHOUT QUOTES -WHY? I FORGOT... WITH = OK)
 input_dirs_and_files_minus_3[ord]=~/.cache               #   print nothing after = if there is no need for another mask
 input_dirs_and_files_minus_4[ord]=*.mymymy               #   but do not delete lines
@@ -115,7 +115,7 @@ input_dirs_and_files_minus_5[ord]=               #   also do not duplicate lines
 
               input_compress[ord]='none'        # - compression agorythm:
                                                  # 'none' or one of: 'gzip', 'bzip2', 'xz', 'lzip', 'lzma', 'lzop', 'zstd'
-                input_verify[ord]='off'           # - verify the archive as does "tar --verify" ('on') or not ('off')
+                input_verify[ord]='off'           # - verify the archive as does "tar --verify" ('on') or do not verify ('off')
 
 
 
@@ -139,7 +139,7 @@ input_dirs_and_files_plus_3[ord]=/etc                #   print nothing after = i
 input_dirs_and_files_plus_4[ord]=                #   but do not delete lines
 input_dirs_and_files_plus_5[ord]=                #   also do not duplicate lines, the max number of masks is 5.
 
-input_dirs_and_files_minus_1[ord]=               # directories and separate file names (or masks) TO BE included in the archive
+input_dirs_and_files_minus_1[ord]=               # directories and separate file names (or masks) NOT TO BE included in the archive
 input_dirs_and_files_minus_2[ord]=               #   (one by each variable, WITHOUT QUOTES -WHY? I FORGOT... WITH = OK)
 input_dirs_and_files_minus_3[ord]=               #   print nothing after = if there is no need for another mask
 input_dirs_and_files_minus_4[ord]=               #   but do not delete lines
@@ -147,37 +147,42 @@ input_dirs_and_files_minus_5[ord]=               #   also do not duplicate lines
 
               input_compress[ord]='bzip2'        # - compression agorythm:
                                                  # 'none' or one of: 'gzip', 'bzip2', 'xz', 'lzip', 'lzma', 'lzop', 'zstd'
-                input_verify[ord]='off'           # - verify the archive as does "tar --verify" ('on') or not ('off')
+                input_verify[ord]='off'           # - verify the archive as does "tar --verify" ('on') or do not verify ('off')
 
 
 
 # =============================================================================================
 # =============================================================================================
 
-# in the very beginning we should change current directory to the directory ewhere script is located
+# in the very beginning we should change current directory to the directory where script is located
+
 
 script_dir="$(dirname "$(realpath "$0")")"    # I am not sure if the quotes are correct, but this works
 echo script_dir:    ${script_dir}           # ATTENTION:  if script itself was called without full path
-                                         #(e.g. "bash B-script-2.sh" )  and "cd" was called upper in the script
+                                         #(e.g. "bash B-script.sh" )  and "cd" was called upper in the script
                                          # - then realpath "$0" IN FACT gives current dir - NOT the dir the script is located in
-				 	# -- hence, if I call "cd" to be sure for paths, I should do it carefully
+ 				 	 # -- hence, if I call "cd" to be sure for paths, I should do it carefully
+                                         # (which means "no _ cd _ upper in the script" !!!)
 
-cd ${script_dir}   # this is done for correct expansion of paths by different commands
+cd ${script_dir}   # make script_dir current directory (this is done for correct expansion of paths by different commands)
 
-check_script_dir="$(dirname "$(realpath "$0")")"     # sama proverka - nizhe (see script_dir_test)
+check_script_dir="$(dirname "$(realpath "$0")")"       # the same expresion as for script_dir, but AFTER cd
 echo check_script_dir:    ${check_script_dir}
+
+# (the check itself is written further below (see script_dir_test))
 
 # =============================================================================================
 # the primary  processing of user-defined settings:
 
-param_sets_quantity=3        # (needs control) - quantity of sets of parameters
-plus_quantity=5           # FOR INFO ONLY (needs control) - quantity of masks of dirs and files to be included in the archive
-minus_quantity=5          # FOR INFO ONLY (needs control) - quantity of masks of dirs and files NOT to be included in the archive
+param_sets_quantity=3   # (needs control !!!) - quantity of sets of parameters
+plus_quantity=5         # FOR INFO ONLY (needs control !!!) - quantity of masks of dirs and files to be included in one archive
+minus_quantity=5        # FOR INFO ONLY (needs control !!!) - quantity of masks of dirs and files NOT to be included in one archive
 
 
 declare -a plus_masks
 declare -a minus_masks
-declare -a minus_masks_exist
+declare -a minus_masks_exist           # we need to know the quantity of specified (non-empty) minus masks,
+                         # because to exclude a mask, we must write "--exclude" for tar each time (this is done below, further)
 
 echo
 echo "==========================================================================="
@@ -404,7 +409,7 @@ echo
 UserName=$(whoami)
 echo UserName:  ${UserName}
 
-# script_dir  is determined in the very beginning
+# script_dir  is determined in the very beginning of this script
 
 
 script_LEVELUP_dir=${script_dir%/*}
@@ -720,7 +725,7 @@ if [[ $create_archives == 'yes' ]] ; then
 		if (( tests[${i}] == 0 )) ; then
 			# echo "i ="  $i                                               # potom steretj
 			# assemble long names for archives:
-			archive_name=$(echo ${script_dir}"/B-Archives/"${input_name[${i}]}"--"${current_date}"--paramset"${i}${extension[${i}]})
+			archive_name=$(echo ${script_dir}"/B-Archives/paramset"${i}"--"${input_name[${i}]}"--"${current_date}${extension[${i}]})
 			# echo ${archive_name}
 			# create long command for tar (gather options):
 			# echo "compress:______________" ${compress_option[${i}]}
@@ -766,31 +771,44 @@ fi
 
 
 # =============================================================================================
-# let's count the size of directory B-Archives 
+# let's count the size of directory B-Archives
 
 declare -i count_in_DSU_long
 declare -i current_DSU_bytes
 declare -i input_DSU_limit_bytes
 
+name_of_dir_with_archives="$(echo ${script_dir}/B-Archives/)"
 
-name_of_dir_with_archives=$(echo ${script_dir}/B-Archives)
-
-current_DSU_long_line=$(eval du --block-size=1 ${name_of_dir_with_archives})
-
-count_in_DSU_long=0
-for k in ${current_DSU_long_line}
+current_DSU_bytes_text=$(eval du --summarize --block-size=1 ${name_of_dir_with_archives})    # gives a string with two fields
+counter_of_fields=0
+for i in  ${current_DSU_bytes_text}
 do
-	count_in_DSU_long+=1
-	if (( count_in_DSU_long == 1 )); then
-		current_DSU_bytes=$k
+	counter_of_fields+=1
+	if (( ${counter_of_fields} == 1 )); then
+		current_DSU_bytes=$i
 	fi
 done
+
+#echo current_DSU_bytes_text = ${current_DSU_bytes_text}
 echo current_DSU_bytes = ${current_DSU_bytes}
 input_DSU_limit_bytes=$(( ${input_DSU_limit_MiB}*(2**20) ))
-echo input_DSU_limit_bytes = $input_DSU_limit_bytes
-if (( ${current_DSU_bytes} >= ${input_DSU_limit_bytes} )); then
-	echo "Current disk space usage in " ${name_of_dir_with_archives} "("  ${current_DSU_bytes} "bytes ) is larger than "
-	echo " input_DSU_limit (" ${input_DSU_limit_bytes} " bytes or " ${input_DSU_limit_MiB} "MiB )"
+if (( ${input_DSU_limit_bytes} > 0 )); then
+	echo "input_DSU_limit_bytes = "$input_DSU_limit_bytes
+else 
+	echo "input_DSU_limit_bytes: unlimited"
+fi
+if (( ${current_DSU_bytes} >= ${input_DSU_limit_bytes} )) && (( ${input_DSU_limit_bytes} > 0 )); then
+	echo "======================================"
+	echo "ATTENTION! Current disk space usage in " ${name_of_dir_with_archives} "(" ${current_DSU_bytes} "bytes)"
+	echo " is larger than input_DSU_limit (" ${input_DSU_limit_bytes} " bytes or "${input_DSU_limit_MiB} "MiB)"
+	echo " CONSIDER DELETING OLD ARCHIVES MANUALLY (no automated deletion will be performed)"
+	echo "======================================"
+elif (( ${current_DSU_bytes} >= $((${input_DSU_limit_bytes}/2)) )) && (( ${input_DSU_limit_bytes} > 0 )); then
+	echo "======================================"
+	echo "ATTENTION! Current disk space usage in " ${name_of_dir_with_archives} "(" ${current_DSU_bytes} "bytes)"
+	echo " is getting close to input_DSU_limit (" ${input_DSU_limit_bytes} " bytes or " ${input_DSU_limit_MiB} "MiB )"
+	echo " CONSIDER DELETING OLD ARCHIVES MANUALLY (no automated deletion will be performed)"
+	echo "======================================"
 fi
 
 # =============================================================================================
