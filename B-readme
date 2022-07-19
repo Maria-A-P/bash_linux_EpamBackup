@@ -5,7 +5,7 @@
 #==================================================================
 #
 # All files related to the backup script are located inside directory 'EpamBackup'.
-# These include the script itself, auxiliary files, this help file, and archives created by the script.
+# These include the script itself, logs, auxiliary files, this help file, and archives created by the script.
 #
 # The directory 'EpamBackup' should be placed either in   '/root/'  or in   '/~/'  (the home directory of a user)
 # 
@@ -34,12 +34,25 @@
 #
 # The archives are saved inside 'EpamBackup/B-Archives/'.
 #
-# Directory 'B-Archives'  should not be copied or renamed.                                           (PROVERIT')
+# Directory 'B-Archives'  should not be deleted, copied or renamed.                                           (PROVERIT')
 #
+# Old archives should be deleted manually (for safety reasons no auto deletion is performed).
 #
 #===================================================================
 #
-# A user or system administrator can specify the following parameters:
+# Logs:
+#
+# Settings and appropriate auto-generated tar commands (that create archives) for all parameters sets 
+#   get into file B-log.
+#
+# All errors and error-like messages are saved to B-log-errors 
+#
+# B-log and B-Log-errors files are generated in EpamBackup directory. 
+# B-log and B-Log-errors files should be cleaned off (or deleted) manually as they become quite large.
+#
+#===================================================================
+#
+# A user or system administrator must specify the following parameters:
 # - the disk space usage (DSU) limit for archives in 'EpamBackup/B-archives/'
 #         (if the limit is reached, a message is sent to command line interface and to 'B-log', 
 #          but no deletion is performed)                                                            (PROVERIT')

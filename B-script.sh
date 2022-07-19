@@ -1,5 +1,17 @@
 #! /bin/bash -x
-#
+
+
+# =============================================================================================
+current_date=$(date +%Z%Y-%m-%d--%H-%M-%S)--$(date -u +%Z%Y-%m-%d--%H-%M-%S)
+
+# redirect all errors to log file with errors (some "error" messages from tar are not errors in fact):
+echo "                                           " >> B-log-errors              # for convenience
+echo "============" ${current_date} "============" >> B-log-errors              # for convenience
+exec 2>> B-log-errors
+# =============================================================================================
+
+
+
 # =============================================================================================
 # =============================================================================================
 # script parameters:
@@ -73,7 +85,7 @@ input_dirs_and_files_plus_5[ord]=                #   also do not duplicate lines
 
 input_dirs_and_files_minus_1[ord]=~/D*          # directories and separate file names (or masks) NOT TO BE included in the archive
 input_dirs_and_files_minus_2[ord]=*.mp3          #   (one by each variable, WITHOUT QUOTES -WHY? I FORGOT... WITH = OK)
-input_dirs_and_files_minus_3[ord]=~/.*              #   print nothing after = if there is no need for another mask
+input_dirs_and_files_minus_3[ord]=~/.??*              #   print nothing after = if there is no need for another mask
 input_dirs_and_files_minus_4[ord]=*.mymymy              #   but do not delete lines
 input_dirs_and_files_minus_5[ord]=               #   also do not duplicate lines, the max number of masks is 5.
 
@@ -166,7 +178,7 @@ echo check_script_dir:    ${check_script_dir}
 # =============================================================================================
 # the primary  processing of user-defined settings:
 
-param_sets_quantity=3   # (needs control !!!) - quantity of sets of parameters
+param_sets_quantity=ord    # (needs control !!!) - quantity of sets of parameters  (= the last ord value)
 plus_quantity=5         # FOR INFO ONLY (needs control !!!) - quantity of masks of dirs and files to be included in one archive
 minus_quantity=5        # FOR INFO ONLY (needs control !!!) - quantity of masks of dirs and files NOT to be included in one archive
 
@@ -180,7 +192,6 @@ echo
 echo "==========================================================================="
 echo
 echo "Local and universal time (year-month-day--hours-mins-secs): "
-current_date=$(date +%Z%Y-%m-%d--%H-%M-%S)--$(date -u +%Z%Y-%m-%d--%H-%M-%S)
 echo $current_date
 echo "==========================================================================="
 echo "Parameters:"
@@ -366,30 +377,6 @@ echo
 
 
 
-
-
-# =============================================================================================
-
-# check: input_amount_of_archives should be >= 0  and integer (in bash all numbers are integer - so there is no need to check)
-
-declare -a amount_of_archives_test_result                # if ok then 0
-echo
-echo "analyzing amount of archives to be stored...."
-echo "====="
-for ((i=1; i<=${param_sets_quantity}; i=i+1))
-do
-	amount_of_archives_test_result[${i}]=0
-	echo "parameters set N:"   ${i}
-	if (( ${input_amount_of_archives[${i}]} < 0 )); then
-		amount_of_archives_test_result[${i}]+=1
-		echo "input_amount_of_archives    should be >= 0"
-		echo "Archive with parameters set N" ${i} "cannot be created" 
-	else
-		echo ".... ok"
-	fi
-	echo "====="
-done
-echo
 
 # =============================================================================================
 
@@ -704,26 +691,47 @@ fi
 # now let/s assemble the long names for archives, including date and extension,
 # and gather optins (lists of files in {}, compression option, verificaton option)
 # and execute tar
-
+# and write positive logs to B-log 
+# (the negative logs are redirected to B-log-errors, see in the beginning of this script)
 # =============================================================================================
 
 
-
+echo "                                           " >> B-log              # for convenience
+echo "==========================================================================" >> B-log
+echo "==========================================================================" >> B-log
+echo "==========================================================================" >> B-log
+echo "============" ${current_date} "============" >> B-log              # for convenience
+echo "                                           " >> B-log
+echo "Arcive(s) will be created for the following parameters sets:" >> B-log
 
 echo $create_archives
 if [[ $create_archives == 'yes' ]] ; then
 	for ((i=1; i<=${param_sets_quantity}; i=i+1))
 	do
 		if (( tests[${i}] == 0 )) ; then
-			# echo "i ="  $i                                               # potom steretj
+			echo " " >> B-log
+			echo "================= parameters set #" $i " =================:" >> B-log
+			echo "=== - name (input_name["$i"]):" ${input_name[$i]} >> B-log
+			echo "=== - dirs and file masks (after filename expansion) to be archived:"  >> B-log
+			echo "===  -- input_dirs_and_files_plus_1["$i"]:  " ${input_dirs_and_files_plus_1[$i]} >> B-log
+			echo "===  -- input_dirs_and_files_plus_2["$i"]:  " ${input_dirs_and_files_plus_2[$i]} >> B-log
+			echo "===  -- input_dirs_and_files_plus_3["$i"]:  " ${input_dirs_and_files_plus_3[$i]} >> B-log
+			echo "===  -- input_dirs_and_files_plus_4["$i"]:  " ${input_dirs_and_files_plus_4[$i]} >> B-log
+			echo "===  -- input_dirs_and_files_plus_5["$i"]:  " ${input_dirs_and_files_plus_5[$i]} >> B-log
+			echo "=== - dirs and files masks (after filename expansion) NOT to be archived:"  >> B-log
+			echo "===  -- input_dirs_and_files_minus_1["$i"]:  " ${input_dirs_and_files_minus_1[$i]} >> B-log
+			echo "===  -- input_dirs_and_files_minus_2["$i"]:  " ${input_dirs_and_files_minus_2[$i]} >> B-log
+			echo "===  -- input_dirs_and_files_minus_3["$i"]:  " ${input_dirs_and_files_minus_3[$i]} >> B-log
+			echo "===  -- input_dirs_and_files_minus_4["$i"]:  " ${input_dirs_and_files_minus_4[$i]} >> B-log
+			echo "===  -- input_dirs_and_files_minus_5["$i"]:  " ${input_dirs_and_files_minus_5[$i]} >> B-log
+			echo "=== - compression (input_compress["$i"]):" ${input_compress[$i]} >> B-log
+			echo "=== - need for verification (input_verify["$i"]):" ${input_verify[$i]} >> B-log
+			echo " " >> B-log
+
 			# assemble long names for archives:
 			archive_name=$(echo ${script_dir}"/B-Archives/paramset"${i}"--"${input_name[${i}]}"--"${current_date}${extension[${i}]})
-			# echo ${archive_name}
+
 			# create long command for tar (gather options):
-			# echo "compress:______________" ${compress_option[${i}]}
-			# echo "verify:______________" ${verify[${i}]}
-			# echo "minus (--exclude):_____________" ${minus_masks[${i}]}
-			# echo "plus:______________" ${plus_masks[${i}]}
 
 			# the script directory (and all archives inside) will not be added to the new archive
 			# (minus_masks should also be excluded from archive)
@@ -754,6 +762,8 @@ if [[ $create_archives == 'yes' ]] ; then
 			# echo text_for_tar__________  ${text_for_tar}
 			# dalee tar
 			eval tar ${text_for_tar}
+			# echo "================= tar command for parameters set # " $i " : =================:" >> B-log
+			# echo "tar" ${text_for_tar} >> B-log
 		fi      #  (( tests[${i}] == 0 ))
 	done
 fi
@@ -766,23 +776,25 @@ fi
 # let's count the size of directory B-Archives
 
 declare -i count_in_DSU_long
-declare -i current_DSU_bytes
+declare -i current_DSU_bytesf
 declare -i input_DSU_limit_bytes
 
 name_of_dir_with_archives="$(echo ${script_dir}/B-Archives/)"
 
-current_DSU_bytes_text=$(eval du --summarize --block-size=1 ${name_of_dir_with_archives})    # gives a string with two fields
-counter_of_fields=0
-for i in  ${current_DSU_bytes_text}
-do
-	counter_of_fields+=1
-	if (( ${counter_of_fields} == 1 )); then
-		current_DSU_bytes=$i
-	fi
-done
+# old text (the new one is below - using awk)
+# current_DSU_bytes_text=$(eval du --summarize --block-size=1 ${name_of_dir_with_archives})    # gives a string with two fields
+# counter_of_fields=0
+# for i in  ${current_DSU_bytes_text}
+# do
+# 	counter_of_fields+=1
+# 	if (( ${counter_of_fields} == 1 )); then
+# 		current_DSU_bytes=$i
+# 	fi
+# done
+# echo current_DSU_bytes_text = ${current_DSU_bytes_text}
 
-#echo current_DSU_bytes_text = ${current_DSU_bytes_text}
-#echo current_DSU_bytes = ${current_DSU_bytes}
+current_DSU_bytes=$(du --summarize --block-size=1 ${name_of_dir_with_archives} | awk '{ print $1 }')    # gives a string with two fields
+# echo current_DSU_bytes = ${current_DSU_bytes}
 
 input_DSU_limit_bytes=$(( ${input_DSU_limit_MiB}*(2**20) ))
 
@@ -796,13 +808,13 @@ if (( ${current_DSU_bytes} >= ${input_DSU_limit_bytes} )) && (( ${input_DSU_limi
 	echo "======================================"
 	echo "ATTENTION! Current disk space usage in " ${name_of_dir_with_archives} "(" ${current_DSU_bytes} "bytes)"
 	echo " is larger than input_DSU_limit (" ${input_DSU_limit_bytes} " bytes or "${input_DSU_limit_MiB} "MiB)"
-	echo " CONSIDER DELETING OLD ARCHIVES MANUALLY (no automated deletion will be performed)"
+	echo " CONSIDER DELETING OLD ARCHIVES MANUALLY (no auto deletion will be performed)"
 	echo "======================================"
 elif (( ${current_DSU_bytes} >= $((${input_DSU_limit_bytes}/2)) )) && (( ${input_DSU_limit_bytes} > 0 )); then
 	echo "======================================"
 	echo "ATTENTION! Current disk space usage in " ${name_of_dir_with_archives} "(" ${current_DSU_bytes} "bytes)"
 	echo " is getting close to input_DSU_limit (" ${input_DSU_limit_bytes} " bytes or " ${input_DSU_limit_MiB} "MiB )"
-	echo " CONSIDER DELETING OLD ARCHIVES MANUALLY (no automated deletion will be performed)"
+	echo " CONSIDER DELETING OLD ARCHIVES MANUALLY (no auto deletion will be performed)"
 	echo "======================================"
 fi
 
@@ -882,11 +894,12 @@ if (( ${amount_of_unique_names} > 0 )); then
 	echo " the name of which starts with:"
 	for ((n=1; n<=${amount_of_unique_names}; n=n+1))
 	do
-		echo "                        " ${unique_names[${n}]} "    is   " ${unique_names_occurrences[${n}]}
+		echo "                        " ${unique_names[${n}]} " ,   is   " ${unique_names_occurrences[${n}]}
 	done
-	echo "If the amount is unreasonably high, consider deleting old archives manually (no automated deletion will be performed)"
+	echo "If the amount is unreasonably high, consider deleting old archives manually (no auto deletion will be performed)"
 fi
-
+echo "===="
+echo "Consider erasing files B-log and B-log-errors if the become too large"
 
 
 
