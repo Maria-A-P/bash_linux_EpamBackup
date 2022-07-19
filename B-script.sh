@@ -1,5 +1,5 @@
 #! /bin/bash -x
-#   
+#
 # =============================================================================================
 # =============================================================================================
 # script parameters:
@@ -21,8 +21,6 @@ declare -a input_name                            # - name for an archive (also t
                                                  # inside ' ' start with a letter, no more than 15 characters
                                                  # (letters, numbers, dashes) are allowed
                                                  # two dashes (--) are NOT allowed
-declare -a input_amount_of_archives              # - amount of archives (if exceeded, a message is generated)
-                                                 #    (ATTENTION: previously this was "input_amount_of_old", but I decided to account for total amount af archives (not only old)
 
                                               # BELOW PATHS SHOULD start with / or ~ (only file masks can start with *)
 declare -a input_dirs_and_files_plus_1           # - directories and separate file names (or masks) TO BE included in the archive
@@ -31,7 +29,7 @@ declare -a input_dirs_and_files_plus_3           #   print nothing after = if th
 declare -a input_dirs_and_files_plus_4           #   but do not delete lines
 declare -a input_dirs_and_files_plus_5           #   also do not duplicate lines, the max number of masks is 5.
 
-declare -a input_dirs_and_files_minus_1          # - directories and separate file names (or masks) TO BE included in the archive
+declare -a input_dirs_and_files_minus_1          # - directories and separate file names (or masks) NOT TO BE included in the archive
 declare -a input_dirs_and_files_minus_2          #   (one by each variable, WITHOUT QUOTES -WHY? I FORGOT... WITH = OK)
 declare -a input_dirs_and_files_minus_3          #   print nothing after = if there is no need for another mask
 declare -a input_dirs_and_files_minus_4          #   but do not delete lines
@@ -65,8 +63,6 @@ ord=1      # do not change this line
                                                  # inside ' ' start with a letter, no more than 15 characters
                                                  # (letters, numbers, dashes) are allowed
                                                  # two dashes (--) are NOT allowed
-        input_amount_of_archives[ord]=2          # amount of archives (if exceeded, a message is generated)
-                                                 #    (ATTENTION: previously this was "input_amount_of_old", but I decided to account for total amount af archives (not only old)
 
                                               # BELOW PATHS SHOULD start with / or ~ (only file masks can start with *)
 input_dirs_and_files_plus_1[ord]=~            # directories and separate file names (or masks) TO BE included in the archive
@@ -97,8 +93,6 @@ ord=2      # do not change this line
                                                  # inside ' ' start with a letter, no more than 15 characters
                                                  # (letters, numbers, dashes) are allowed
                                                  # two dashes (--) are NOT allowed
-        input_amount_of_archives[ord]=2          # amount of old archives (if exceeded, a message is generated)
-                                                 #    (ATTENTION: previously this was "input_amount_of_old", but I decided to account for total amount af archives (not only old)
 
                                               # BELOW PATHS SHOULD start with / or ~ (only file masks can start with *)
 input_dirs_and_files_plus_1[ord]=~                # directories and separate file names (or masks) TO BE included in the archive
@@ -129,8 +123,6 @@ ord=3      # do not change this line
                                                  # inside ' ' start with a letter, no more than 15 characters
                                                  # (letters, numbers, dashes) are allowed
                                                  # two dashes (--) are NOT allowed
-        input_amount_of_archives[ord]=2          # amount of archives (if exceeded, a message is generated)
-                                                 #    (ATTENTION: previously this was "input_amount_of_old", but I decided to account for total amount af archives (not only old)
 
                                               # BELOW PATHS SHOULD start with / or ~ (only file masks can start with *)
 input_dirs_and_files_plus_1[ord]=/home/mysshfriend/*     # directories and separate file names (or masks) TO BE included in the archive
@@ -574,7 +566,7 @@ do
 			verify_test_result[${i}]=1
 			echo "You should have selected whether the archive should be verified"
 			echo "  after creation (on) or not (off)"
-			echo "Archive with parameters set N" ${i} "cannot be created" 
+			echo "Archive with parameters set N" ${i} "cannot be created"
 	esac
 	if [[ ${verify_test_result[${i}]} == 0 ]]; then
 		echo "archive verification option:"  ${verify_option[${i}]}
@@ -790,13 +782,16 @@ do
 done
 
 #echo current_DSU_bytes_text = ${current_DSU_bytes_text}
-echo current_DSU_bytes = ${current_DSU_bytes}
+#echo current_DSU_bytes = ${current_DSU_bytes}
+
 input_DSU_limit_bytes=$(( ${input_DSU_limit_MiB}*(2**20) ))
-if (( ${input_DSU_limit_bytes} > 0 )); then
-	echo "input_DSU_limit_bytes = "$input_DSU_limit_bytes
-else 
-	echo "input_DSU_limit_bytes: unlimited"
-fi
+
+#if (( ${input_DSU_limit_bytes} > 0 )); then
+#	echo "input_DSU_limit_bytes = "$input_DSU_limit_bytes
+#else 
+#	echo "input_DSU_limit_bytes: unlimited"
+#fi
+
 if (( ${current_DSU_bytes} >= ${input_DSU_limit_bytes} )) && (( ${input_DSU_limit_bytes} > 0 )); then
 	echo "======================================"
 	echo "ATTENTION! Current disk space usage in " ${name_of_dir_with_archives} "(" ${current_DSU_bytes} "bytes)"
@@ -819,7 +814,7 @@ declare -i count_files
 declare -i total_number_of_files
 
 list_of_all_archives=$(eval ls ${name_of_dir_with_archives})
-echo ${list_of_all_archives}
+# echo ${list_of_all_archives}
 
 count_files=0
 for k in ${list_of_all_archives}
@@ -827,6 +822,7 @@ do
 	count_files+=1
 	length_of_filename=$(echo ${#k})
 	first_two_hyphens_detected=0
+	second_two_hyphens_detected=0
 	current_short_name=""
 	end_of_seek_in_filename=$(( ${length_of_filename}-1 ))
 	for ((j=1; j<=${end_of_seek_in_filename}; j=j+1))
@@ -835,9 +831,12 @@ do
 		position2=j
 		symbol1=$(echo ${k:position1:1})   # i.e. one symbol in position 'position1'
 		symbol2=$(echo ${k:position2:1})   # i.e. one symbol in position 'position2'
-		if [[ ${symbol1} == '-' ]]  &&  [[ ${symbol2} == '-' ]] ; then 
+		if [[ ${symbol1} == '-' ]]  &&  [[ ${symbol2} == '-' ]] && (( ${first_two_hyphens_detected} == 0 )); then
 			first_two_hyphens_detected=1
-		elif [[ ${first_two_hyphens_detected=1} == 0 ]] ; then
+			current_short_name+=${symbol1}
+		elif [[ ${symbol1} == '-' ]]  &&  [[ ${symbol2} == '-' ]] && (( ${first_two_hyphens_detected} == 1 )); then
+			second_two_hyphens_detected=1
+		elif [[ ${second_two_hyphens_detected=1} == 0 ]] ; then
 			current_short_name+=${symbol1}
 		fi
 	done
@@ -854,7 +853,7 @@ amount_of_unique_names=0
 for ((j=1; j<=${total_number_of_files}; j=j+1))
 do
 	current_short_name=${existing_archives_short_names[${j}]}
-	echo ${current_short_name}
+	# echo ${current_short_name}
 	if (( amount_of_unique_names == 0 )); then
 		amount_of_unique_names=1
 		unique_names[1]=${current_short_name}
@@ -877,33 +876,25 @@ do
 	fi
 done
 
-echo amount_of_unique_names  ${amount_of_unique_names}
-for ((n=1; n<=${amount_of_unique_names}; n=n+1))
-do
-	echo ${unique_names[${n}]}  ${unique_names_occurrences[${n}]}
-done
+# echo amount_of_unique_names  ${amount_of_unique_names}
+if (( ${amount_of_unique_names} > 0 )); then
+	echo "Amount of archives in " ${name_of_dir_with_archives} "," 
+	echo " the name of which starts with:"
+	for ((n=1; n<=${amount_of_unique_names}; n=n+1))
+	do
+		echo "                        " ${unique_names[${n}]} "    is   " ${unique_names_occurrences[${n}]}
+	done
+	echo "If the amount is unreasonably high, consider deleting old archives manually (no automated deletion will be performed)"
+fi
 
 
-# now we'll find the allowed amount of archives (input_amount_of_archives) for each name of existing archives
-#
+
+
+
 # we have:
-# 1) param_sets_quantity, arrays "input_name", "input_amount_of_archives" 
+# 1) param_sets_quantity, arrays "input_name"
 # 2) amount_of_unique_names , arrays "unique_names", "unique_names_occurrences"
-# we'll find for each of "unique_names"  "unique_names_occurrences" 
-#               a corresponding "input_amount_of_archives" (and name it "unique_names_allowed_amount")
-#   (if we don't find the corresponding "input_amount_of_archives", then we will assume that it is 0)
-#
 
-
-
-
-
-
-
-
-
-
-# dlia voprosov sdelatj opziu ih otklucheniya (silent) - chtoby avtomaticheski vse rabotalo
 
 
 

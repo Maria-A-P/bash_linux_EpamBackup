@@ -5,9 +5,9 @@
 #==================================================================
 #
 # All files related to the backup script are located inside directory 'EpamBackup'.
-# These include the script itself, auxiliary files, logs, this help file, and archives created by the script.
+# These include the script itself, auxiliary files, this help file, and archives created by the script.
 #
-# The directory 'EpamBackup' should be placed either in   '/root/'  or in   '/~/'  (the home directory of a common user)
+# The directory 'EpamBackup' should be placed either in   '/root/'  or in   '/~/'  (the home directory of a user)
 # 
 # If the path to 'EpamBackup' directory is  '/root/EpamBackup' 
 # then one can choose to backup any files ( ??? except those located inside users' home directories (inside /home) - NO...)  (PROVERIT')
@@ -34,9 +34,8 @@
 #
 # The archives are saved inside 'EpamBackup/B-Archives/'.
 #
-# Directories 'B-Archives' and 'B-Temp', log file 'B-log'  should not be copied or renamed.        (PROVERIT')
+# Directory 'B-Archives'  should not be copied or renamed.                                           (PROVERIT')
 #
-# 'B-log' can be truncated or deleted; it will be created again on next execution of the script.
 #
 #===================================================================
 #
@@ -45,10 +44,6 @@
 #         (if the limit is reached, a message is sent to command line interface and to 'B-log', 
 #          but no deletion is performed)                                                            (PROVERIT')
 #          ('0' or '' means 'no limit'),
-# - the amount of old archives with the same name of the set of parameters to be stored 
-#          (the oldest one is subject to deletion before the new one is created),                       (PROVERIT')
-#          (note that if the parameters change, but the name of their set does not, 
-#           old archives with corresponding name are not preserved from being deleted)
 # - the names of directories and separate files to be archived
 #           (as described in "Pattern Matching" section of Bash reference manual - e.g. '~/Documents', or '/*')                  
 #           A user can choose directories and files inside his home directory only (in case of  '/home/"username"/EpamBackup/'),
