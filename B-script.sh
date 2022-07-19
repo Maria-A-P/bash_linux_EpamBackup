@@ -161,7 +161,10 @@ input_dirs_and_files_minus_5[ord]=               #   also do not duplicate lines
 # in the very beginning we should change current directory to the directory where script is located
 
 
-script_dir="$(dirname "$(realpath "$0")")"    # I am not sure if the quotes are correct, but this works
+
+path_to_0=$(realpath "$0")
+echo ${path_to_0}
+script_dir=$(dirname ${path_to_0})
 echo script_dir:    ${script_dir}           # ATTENTION:  if script itself was called without full path
                                          #(e.g. "bash B-script.sh" )  and "cd" was called upper in the script
                                          # - then realpath "$0" IN FACT gives current dir - NOT the dir the script is located in
@@ -391,7 +394,7 @@ echo UserName:  ${UserName}
 # script_dir  is determined in the very beginning of this script
 
 
-script_LEVELUP_dir=${script_dir%/*}
+script_LEVELUP_dir=$(dirname ${script_dir})
 echo script_LEVELUP_dir:    ${script_LEVELUP_dir}
 
 user_home_dir=$(realpath ~)        # no matter if a user is root or common user, this is his home dir

@@ -1,6 +1,6 @@
 # Parameters for backup are set inside 'B-script.sh'
 # See notes inside 'B-script.sh'
-# Type 'nano B-script.sh' in order to read notes and specify the parameters
+# Type something like 'nano B-script.sh' in order to read notes and specify the parameters
 #   
 #==================================================================
 #
@@ -12,11 +12,11 @@
 # If the path to 'EpamBackup' directory is  '/root/EpamBackup' 
 # then one can choose to backup any files ( ??? except those located inside users' home directories (inside /home) - NO...)  (PROVERIT')
 #
-# If the path to 'EpamBackup' directory is '/home/"u_s_e_r_n_a_m_e"/EpamBackup' 
-# then files within '/home/"u_s_e_r_n_a_m_e"/' only can be chosen to be backed-up                               (PROVERIT')
+# If the path to 'EpamBackup' directory is '/home/u_s_e_r_n_a_m_e/EpamBackup' 
+# then files within '/home/u_s_e_r_n_a_m_e/' only can be chosen to be backed-up                               (PROVERIT')
 #
 # 
-# Appropriate rwx rights and ownership for the script itself and associated files             (TUT UKAZATJ KAKIE FAILY)
+# Appropriate rwx rights and ownership for the script file (B-script.sh) (and maybe for the whole folder EpamBackup)
 #  should be set by system adminisrator, no check is performed by the script.                           (PROVERIT')
 #
 #===================================================================
@@ -42,8 +42,7 @@
 #
 # Logs:
 #
-# Settings and appropriate auto-generated tar commands (that create archives) for all parameters sets 
-#   get into file B-log.
+# Settings for all parameters sets get into file B-log.
 #
 # All errors and error-like messages are saved to B-log-errors 
 #
@@ -65,7 +64,7 @@
 #           Also note that any hard or symbolic links are being archived as a full copy of the file they were pointing at.
 #           The amount of patterns for directories and separate files paths together is currently limited by 5.
 # - the names of directories and files inside the above-mentioned directories that should not be archived       (PROVERIT')
-#           (as described in "Pattern Matching" section of Bash reference manual - e.g. '*.mp3', or '~/2018-*')                 
+#           (as described in "Pattern Matching" section of Bash reference manual - e.g. '*.mp3', or '~/.??*')                 
 #           The amount of patterns for directories and files paths together is currently limited by 5.
 # - a compression algorithm                                                                           (PROVERIT')
 # - the need for verification of created archives (recommended, but takes time)                       (PROVERIT')
